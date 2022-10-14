@@ -1,0 +1,83 @@
+{% include "header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('{{post.img_url}}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{{post.title}}</h1>
+            <h2 class="subheading">{{post.subtitle}}</h2>
+            <span class="meta">Posted by
+<!--              #Changed from post.author as post.author.name is now a User object.-->
+              <a href="#">{{post.author.name}}</a>
+              on {{post.date}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+        <p>
+            {{ post.body|safe }}
+        </p>
+          <hr>
+          {% if current_user.id == 1%}
+            <div class="clearfix">
+            <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+            </div>
+          {% endif %}
+
+
+<!--           Comments Area -->
+
+          {{ ckeditor.load() }}
+          {{ ckeditor.config(name='comment') }}
+          {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+
+          <div class="col-lg-8 col-md-10 mx-auto comment">
+              <ul class="commentList">
+<!--                When trying to reference the comment in each post use the RELATIONSHIP variable in the db
+                    Thus it would be post_comments-->
+                {%for comment in post.post_comments%}
+                  <li>
+                      <div class="commenterImage">
+<!--                        <img src="https://pbs.twimg.com/profile_images/744849215675838464/IH0FNIXk.jpg"/>-->
+                            <img src="{{ comment.user.email | gravatar }}"/>
+                      </div>
+                      <div class="commentText">
+                        <p>
+<!--                          To access the comment of each post, since comment is now an object of the Comment class
+                              use the '.' notation for referencing it. Don't for get the "|safe" usage of CKeditor
+                              or else it will print the html code as well-->
+                        {{ comment.comment|safe }}
+                        </p>
+                        <span class="date sub-text">{{comment.user.name}}</span>
+
+                          {% if current_user.id == comment.user_id or current_user.id == 1: %}
+                            <a href="{{url_for('delete_comment', comment_id=comment.id, post_id=post.id) }}">✘</a>
+                          {% endif %}
+
+                      </div>
+
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <hr>
+{% include "footer.html" %}
