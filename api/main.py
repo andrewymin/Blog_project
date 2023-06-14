@@ -6,11 +6,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 # from dotenv import load_dotenv
 import os
+
+# from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+# vercel doesn't recognize imports from other files thus copy&paste from that file
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, PasswordField
+from wtforms.fields import EmailField
+# import email_validator
+from wtforms.validators import DataRequired, URL, Email
+from flask_ckeditor import CKEditorField
+# from flask_login import UserMixin
 
 app = Flask(__name__)
 # Commented out code below to use env variables on Heroku
@@ -95,6 +104,32 @@ class Comment(db.Model):
 #     db.create_all()
 if not os.path.isfile('sqlite:///blog.db'):
     db.create_all()
+
+## Forms from forms.py file for vercel to work
+class CreatePostForm(FlaskForm):
+    title = StringField("Blog Post Title", validators=[DataRequired()])
+    subtitle = StringField("Subtitle", validators=[DataRequired()])
+    img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
+    body = CKEditorField("Blog Content", validators=[DataRequired()])
+    submit = SubmitField("Submit Post")
+
+
+class RegisterForm(FlaskForm):
+    email = EmailField("Email", validators=[DataRequired(), Email(message="Please enter a valid email")])
+    password = PasswordField("Password", validators=[DataRequired()])
+    name = StringField("Name", validators=[DataRequired()])
+    submit = SubmitField("Sign Me Up")
+
+
+class LoginForm(FlaskForm):
+    email = EmailField("Email", validators=[DataRequired(), Email(message="Please enter a valid email")])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Login")
+
+
+class CommentForm(FlaskForm):
+    comment = CKEditorField("Comment", validators=[DataRequired()])
+    submit = SubmitField("Submit Comment")
 
 
 ##This callback is used to reload the user object from the user ID stored in the session.
