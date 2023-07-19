@@ -7,7 +7,7 @@ Lib
 instance/*
 !instance/.gitignore
 .webassets-cache
-.env
+api/.env
 .idea
 blog.db
 pyvenv.cfg
