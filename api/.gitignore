@@ -8,6 +8,10 @@ instance/*
 !instance/.gitignore
 .webassets-cache
 .env
+.idea
+blog.db
+pyvenv.cfg
+
 
 ### Flask.Python Stack ###
 # Byte-compiled / optimized / DLL files
